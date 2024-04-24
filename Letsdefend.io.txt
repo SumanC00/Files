@@ -1,0 +1,83 @@
+PSQL CHEAT SHEET COMMANDS https://tomcam.github.io/postgres/#creating-a-database
+																					Data Management
+Data - collection of raw facts, figures, statistics, or information that are typically in a structured or unstructured form.
+Data Management - Process of acquiring, organizing, storing, securing, maintaining, and utilizing data efficiently and effectively throughout its lifecycle.
+Database - A structured collection of data that is organized, stored, and managed in a way that enables efficient retrieval, manipulation, and analysis of the information it contains.
+Database Management System (DBMS) - A Database Management System (DBMS) is software that enables users and applications to interact with a database
+Data Model - A data model is a conceptual representation of the structure, relationships, and rules that govern the storage, organization, and manipulation of data in a database or information system.
+	------Types of Data Models------------------------
+Relational (Table) Data Model - Most popular data model where data is kept in tables consisting of rows and columns.
+	- Data is contained in rows and columns, Each column has a separate name and represents "Attributes", Each row represents a single entity.
+Semi-structured Data Model - A data model in which the data values and the schema of the data are nested altogether.
+Key-Value Data Model - The Key-Value data model is generally used the non-relational databases.
+Graph-Based Data Model - A data model that works by establishing relationships between data.
+Object-oriented Data Model - A data model that emerged as a result of the combination of object-oriented programming and relational data model.
+-----Building a Database Lab----------
+Install postgres, password "postgres", port 5432
+When opening SQL shell (psql), it asks for Server, Database, Port, Username, and Password (postgres)
+Download a table database, import it using cmd, connect to it on psql, display database
+CREATE DATABASE northwind; -> to make a database
+cd “C:\Program Files\PostgreSQL\15\bin” -> to go to the location of the exe going to use next
+psql -U postgres northwind < C:\Users\Suman\Download\northwind.sql -> exe psql to import northwind.sql, -U is user, which is blank in this
+\c northwind -> connect to northwind database in psql
+\dt -> display the tables on the database
+SELECT * FROM region; -> select to view the data in the database from the region table.
+SELECT region_description FROM region; -> select to view the data from the region_description column from region table.
+SELECT DISTINCT discount FROM order_details; -> select to view unique discount from the order_details table.
+SELECT * FROM categories; -> select to view from the categories table.
+SELECT * FROM categories WHERE category_id=8; -> Filter with WHERE to view from categories table for category_id is 8.
+SELECT * FROM categories WHERE category_id BETWEEN 3 AND 6; -> view from categories table where category_id row is between 3 and 6.
+SELECT * FROM categories WHERE category_id IN (6,4); -> view from categories table where category_id is in values 6 or 4.
+SELECT * FROM order_details WHERE order_id=10294; -> view from order_details table where order_id rows equals 10294.
+SELECT * FROM order_details WHERE order_id=10294 AND quantity=15; -> view from order_Details table where order_is row is 10294 and quantity row is 15.
+USE single quote ' for characters. like SELECT * FROM identity WHERE name='Suman'; or something like that.
+LINES = JUST THE DATA INFO, not actual lines of text
+SELECT * FROM order_details WHERE order_id=10294 OR quantity=90; -> order_id is 10294 or quantity is 90. FROM order_details table.
+SELECT * FROM region WHERE NOT region_id=1; -> view all from region table where region_id is not 1.
+The “ORDER BY” command is used for sort operations.
+SELECT * FROM region ORDER BY region_id; -> view all from region table ordering region_id by smallest to largest.
+SELECT * FROM region ORDER BY region_id DESC; -> view all from region table order region_id by largest to smallest. (DESC-ENDING order)
+SELECT * FROM region ORDER BY region_id ASC; -> opposite of DESC, by default so not needed. Same as default order by command.
+The "INSERT INTO" command is the command used to add records to the table in the database. 
+INSERT INTO region(region_id, region_description) VALUES (5, 'Central'); -> insert a new value into region table, 5 = region_id, central = region_description.
+INSERT INTO table_name(column1, column2 …) VALUES (value1, value2 …); -> template to add values to table.
+It is possible to detect "NULL" type values with SQL queries. 
+SELECT * FROM region WHERE region_id IS NULL; -> check all from region table where region_id is empty/null.
+SELECT * FROM region WHERE region_id IS NOT NULL; -> check all from region table where region_id is not empty.
+The "UPDATE" command is used to make changes to the existing information.
+UPDATE region SET region_description='Middle' WHERE region_id=5; -> update the region table and set region_descript to Middle where region_id is 5.
+The "DELETE" command is used for deleting data or record.
+DELETE FROM region WHERE region_id=5; -> Delete from region table where region_id is 5.
+The "LIMIT" command is used to limit long outputs to the desired number of lines.
+SELECT * FROM region LIMIT 2; -> View all from region table but limit to display only 2 rows.
+SELECT count(*) FROM region; -> count how many rows are in region table.
+The “MIN()” function is the command that returns the smallest value. The MAX() function is the command that returns the largest value.
+SELECT MIN(unit_price) FROM order_details; -> display the minimum unit_price from order_details table.
+SELECT MAX(unit_price) FROM order_details; -> display the maximum unit_price from order_Details table.
+The “COUNT()” function is the command that displays the number of lines.
+SELECT count(region_id) FROM region; -> View number of region_id values from region table.
+The “AVG()” function helps calculating the average of numeric values.
+SELECT AVG(region_id) FROM region; -> view average of the values in region_id column in region table.
+The “SUM()” function is used to calculate the sum of numeric values.
+SELECT SUM(region_id) FROM region; -> view the sum of the values in region_id column from region table.
+The "LIKE" operator is used to search for a specific pattern and is used along with the “WHERE” command.
+SELECT * FROM region WHERE region_description LIKE '%ern'; -> View all from region table where region_description is like WORDSern. Ex. WESTern, EASTern, SOUTHern, NORTHern.
+The “UNION” operator is used to combine the results of multiple queries into a single output.
+SELECT * FROM alert UNION SELECT * FROM alert2; -> View all from alert table and all from alert2 table.
+The SUBSTR() function is the command that cuts a certain character group from the desired location to the desired length.
+SELECT substr(region_description, 1, 4) FROM region; -> view first 4 char from region_description column from region table.
+The DROP DATABASE command is used to delete the database.
+DROP DATABASE temp_database; -> delete database temp_database.
+The SELECT version() command provides the postgresql version.
+Comment lines are important for SQL and we should know about them. For example, one of the uses of comment for PostgreSQL is as follows: SELECT * FROM /* This is a comment. */ alert;
+
+
+= Equal
+> Greater than
+< Less than
+>= Greater than or equal
+<= Less than or equal
+<> Not equal
+BETWEEN - Between a certain range
+LIKE - Search for a pattern
+IN - To specify multiple possible values for a column
